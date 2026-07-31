@@ -29,7 +29,7 @@ Prof. AshaRani Patil
 - [x] Problem Statement
 - [x] Objectives
 - [x] Proposed Methodology
-- [ ] Data Collection
+- [x] Data Collection
 - [ ] Model Development
 - [ ] Evaluation
 - [ ] Deployment
