@@ -1,0 +1,60 @@
+# =========================
+# Python virtual environment
+# =========================
+.venv/
+venv/
+env/
+
+# =========================
+# Python cache
+# =========================
+__pycache__/
+*.py[cod]
+
+# =========================
+# Raw biological datasets
+# =========================
+data/raw/goa_uniprot_all.gaf
+data/raw/uniprot_sprot.fasta
+
+# =========================
+# Large uncompressed processed data
+# =========================
+data/processed/proteins.tsv
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# ML model files
+# =========================
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+
+# =========================
+# Generated embeddings
+# =========================
+data/embeddings/
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
