@@ -1,139 +1,101 @@
-# 🧬 Ontology-Aware Protein Function Prediction
+# Ontology-Aware Protein Function Prediction from Primary Sequence Using Frozen Protein Language Models
 
-## From Primary Protein Sequence Using Frozen Protein Language Models
+Predict a protein's biological function directly from its amino acid sequence, addressing the huge gap between
+known sequences and experimentally verified functions. A pretrained **ESM-2 (650M)** protein language model is used
+as a **frozen feature extractor** (no expensive fine-tuning); its embeddings feed a multi-label **MLP** that predicts
+**Gene Ontology (GO)** terms across Molecular Function (MF), Biological Process (BP) and Cellular Component (CC).
+The model is **ontology-aware**: a hierarchy-consistency loss discourages predicting a child GO term with a higher
+probability than its parent, a common biological-consistency failure of simpler models.
 
-An AI-driven bioinformatics project for predicting protein functions directly from amino acid sequences using frozen ESM-2 protein language model embeddings, a multi-label MLP classifier, and Gene Ontology (GO) hierarchy-aware learning.
+## Team
 
-## 📌 Overview
+Khushi Patil, Diya Kalghatgi, Nidhi Nayak. 
 
-Protein function annotation is a fundamental task in computational biology with applications in drug discovery, disease analysis, genomics, and biotechnology.
+Guide: Prof. AshaRani Patil.
 
-The rapid growth of protein sequence databases has created a significant gap between the number of known protein sequences and the number of proteins whose functions have been experimentally validated.
+## Where we stand (updated 2026-10-06, Phase 1)
 
-This project proposes an automated deep learning framework that predicts protein functions directly from their primary amino acid sequences.
+**Status: core pipeline built and trained end to end. Validation of results and deployment are next.**
 
-The system uses:
+- [x] Literature survey, research gap, problem statement, objectives
+- [x] Design (ER, sequence and data-flow diagrams), requirement and feasibility analysis
+- [x] Data collection: UniProt Swiss-Prot (FASTA), GOA (GAF), Gene Ontology (OBO)
+- [x] Data preprocessing and label building (GO propagation, term selection, split)
+- [x] ESM-2 650M embedding extraction (Google Colab T4 GPU)
+- [x] Model development: baseline MLP and ontology-aware MLP
+- [x] First evaluation (Fmax, AUPR, hierarchy violations)
+- [ ] **Validate results** (stricter split, experimental-only labels, per-ontology violation metric)
+- [ ] Hyper-parameter tuning, rare-term analysis, ablations
+- [ ] Streamlit app (`streamlit_app/`) and prediction history
+- [ ] Final report
 
-ESM-2 as a frozen protein language model and feature extractor
-Multi-Layer Perceptron (MLP) for multi-label classification
-Gene Ontology (GO) for functional annotation
-GO hierarchy-aware learning to improve biological consistency
-Precision, Recall, F1-score, Fmax, and AUPR for evaluation
-Streamlit for the final user-facing application
+## Pipeline at a glance
 
-The proposed system predicts GO terms across the three major Gene Ontology categories:
-🧪 Molecular Function (MF)
-🧬 Biological Process (BP)
-🧫 Cellular Component (CC)
+```
+uniprot_sprot.fasta ┐
+goa_uniprot_all.gaf ├─► data_prep.py ─► labelled dataset ─► embed.py (ESM-2 650M, frozen) ─► train.py (MLP)
+go-basic.obo        ┘     (propagate annotations up the GO graph)                          ─► evaluate.py ─► predict.py / app
+```
 
-## 🎯 Problem Statement
+## First results (test split)
 
-The number of known protein sequences is increasing rapidly due to advances in sequencing technologies, while experimentally verified protein functions cannot keep pace.
+| Model | Ontology | Fmax | AUPR micro | AUPR macro | Hierarchy violations @0.5 (raw) |
+|---|---|---|---|---|---|
+| baseline (no hierarchy loss) | MF | 0.9542 | 0.9864 | 0.8980 | 0.0071 |
+| baseline | BP | 0.9430 | 0.9671 | 0.7298 | 0.0071 |
+| baseline | CC | 0.9525 | 0.9642 | 0.6919 | 0.0071 |
+| ontology-aware (lambda = 0.5) | MF | 0.9542 | 0.9870 | 0.8958 | 0.0048 |
+| ontology-aware | BP | 0.9436 | 0.9677 | 0.7228 | 0.0048 |
+| ontology-aware | CC | 0.9523 | 0.9630 | 0.6824 | 0.0048 |
 
-Traditional experimental annotation is:
-Time-consuming
-Expensive
-Resource-intensive
-Difficult to scale
+**How to read these honestly**
+- The hierarchy loss reduced inconsistent predictions (violations 0.0071 to 0.0048, about one third fewer) while
+  keeping accuracy essentially unchanged (Fmax differences are 0.001 or less, i.e. within noise).
+- The accuracy numbers are **much higher than published CAFA-style results**. Likely causes: random train/test split
+  (similar proteins on both sides), inclusion of computationally inferred (IEA) annotations, and many very common
+  ancestor terms that are easy to predict. They should be validated before being presented as real performance.
+- The violation rate is currently computed over all terms together, so it is identical for the three ontologies.
+  It should be computed per ontology (known issue, see Next steps).
 
-Existing computational approaches may also struggle to capture complex sequence patterns, handle severe class imbalance, and maintain the hierarchical relationships between Gene Ontology terms.
+## Next steps
 
-Therefore, there is a need for an automated, scalable, accurate, and biologically consistent protein function prediction system capable of analyzing large volumes of protein sequence data.
+1. Re-evaluate with a **similarity-based split** (e.g. cluster sequences at 30-50% identity, keep clusters whole).
+2. Re-run with **experimental evidence only** (`KEEP_EVIDENCE` in `src/config.py`) and compare.
+3. Report Fmax on **rarer, more specific terms** as well as overall.
+4. Fix the **per-ontology violation metric** in `src/evaluate.py`.
+5. Try several lambda values (0, 0.1, 0.5, 1.0) and plot loss curves from `results/*_history.json`.
+6. Build the **Streamlit app** around `src/predict.py`.
 
-## 💡 Objectives
+Full dated history: **[docs/PROJECT_LOG.md](docs/PROJECT_LOG.md)** | Phase 1 talk prep: **[docs/PHASE1_PRESENTATION_GUIDE.md](docs/PHASE1_PRESENTATION_GUIDE.md)**
 
-The project aims to:
+## How to run (quick reference)
 
-1. Develop an automated deep learning system for predicting protein functions directly from amino acid sequences using pretrained ESM-2 embeddings.
-2. Design a multi-label classification model for predicting Gene Ontology terms.
-3. Incorporate Gene Ontology hierarchical relationships to produce biologically consistent predictions.
-4. Evaluate the proposed model using appropriate metrics for imbalanced multi-label classification.
-5. Develop a user-friendly platform that allows users to submit protein sequences and obtain predicted functional annotations.
+Full details, troubleshooting and settings: **[docs/PIPELINE_GUIDE.md](docs/PIPELINE_GUIDE.md)**
 
-## 🔬 Methodology
+**Rule of thumb:** raw datasets stay on the laptop; only `processed.zip` goes to Google Colab.
 
-### 1. Data Collection
+**On the laptop**
 
-Protein sequences and functional annotations are collected from publicly available biological resources:
-1. UniProt Swiss-Prot
-2. Gene Ontology Consortium
-3. UniProt-GOA
+```bash
+# put uniprot_sprot.fasta and goa_uniprot_all.gaf in data/raw/
+python src/download_go.py          # dataset 3: go-basic.obo -> data/raw/  (or download manually, see guide)
+python src/data_prep.py            # builds data/processed/ (slow GAF scan, no GPU needed)
+python src/make_processed_zip.py   # creates data/processed.zip
+git push                           # so Colab can fetch the code
+```
 
-The project uses curated protein sequences and functional annotations for model development.
+**On Google Drive:** upload `data/processed.zip` to `MyDrive/ontology-aware-protein-function-prediction/data/`
 
-### 2. Data Preprocessing
+**On Colab (T4 GPU):** open `notebooks/protein_function_colab.ipynb` and run all cells. It does:
+ESM-2 650M embeddings (`embed.py`) → MLP baseline + ontology-aware model (`train.py`) → metrics (`evaluate.py`).
+Start with `EMBED_LIMIT = 50000`, then set it to `None` for the full run (resumes if Colab disconnects).
 
-The preprocessing stage includes:
-1. Removing duplicate protein sequences
-2. Filtering noisy annotations
-3. Selecting relevant experimentally supported labels
-4. Mapping proteins to their associated GO terms
-5. Converting GO annotations into multi-hot encoded labels
-
-Preparing Gene Ontology hierarchy information
-
-### 3. Feature Extraction Using ESM-2
-
-The project uses a pretrained ESM-2 protein language model to generate numerical representations of protein sequences.
-Instead of fine-tuning the entire transformer, ESM-2 is used as a frozen feature extractor.
-
-This approach reduces computational requirements while taking advantage of the rich biological representations learned by the pretrained protein language model.
-
-### 4. Multi-Label Classification
-
-A protein can have multiple biological functions simultaneously.
-
-Therefore, protein function prediction is formulated as a multi-label classification problem.
-
-The extracted ESM-2 embeddings are passed to a 3-layer Multi-Layer Perceptron (MLP) that predicts multiple GO terms for each protein.
-
-### 5. Ontology-Aware Learning
-
-Gene Ontology is organized as a hierarchical structure consisting of relationships between broader parent terms and more specific child terms.
-
-A major objective of this project is to incorporate this hierarchy into the prediction process.
-
-The proposed hierarchical loss mechanism encourages the model to produce biologically consistent predictions and reduces cases where a specific child GO term is predicted without its corresponding broader parent annotation.
-
-### 6. Dataset
-
-UniProt Swiss-Prot - Curated protein sequences and expert-reviewed annotations
-Gene Ontology (GO) - Functional terms and hierarchical relationships
-UniProt-GOA - Protein-GO functional associations
-
-Exact dataset sizes and final train/validation/test splits will be documented after the complete preprocessing pipeline and experimental setup are finalized.
-
-## 🧪 Why Frozen ESM-2?
-
-Large protein language models contain millions of learned parameters and can be computationally expensive to fine-tune.
-
-This project therefore uses ESM-2 as a frozen model.
-
-Advantages
-1. Reduces computational requirements
-2. Avoids expensive transformer fine-tuning
-3. Allows reusable protein representations
-4. Simplifies downstream model training
-5. Makes the approach more practical for limited computational environments
-
-## Team Members
-
-- Khushi Patil
-- Diya Kalghatgi
-- Nidhi Nayak
-
-## Guide
-
-Prof. AshaRani Patil
-
-## Progress
-
-- [x] Literature Survey
-- [x] Research Gap
-- [x] Problem Statement
-- [x] Objectives
-- [x] Proposed Methodology
-- [x] Data Collection
-- [ ] Model Development
-- [ ] Evaluation
-- [ ] Deployment
+| Script | Purpose | Runs on |
+|--------|---------|---------|
+| `src/download_go.py` | download Gene Ontology file | laptop |
+| `src/data_prep.py` | FASTA + GAF + OBO → labelled dataset | laptop |
+| `src/make_processed_zip.py` | package processed data for Drive | laptop |
+| `src/embed.py` | frozen ESM-2 650M embeddings | Colab GPU |
+| `src/train.py` | 3-layer MLP + GO-hierarchy loss | Colab |
+| `src/evaluate.py` | Fmax, AUPR, hierarchy violations | Colab |
+| `src/predict.py` | predict GO terms for a new FASTA | Colab / GPU |
