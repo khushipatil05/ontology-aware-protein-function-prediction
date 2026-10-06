@@ -27,7 +27,6 @@ Repo structure (`data/`, `src/`, `models/`, `notebooks/`, `results/`, `docs/`) a
 
 ## Milestone 4 — First full run on Colab (done)
 - Embeddings extracted, baseline (lambda=0) and ontology-aware (lambda=0.5) models trained and evaluated.
-- Run details (fill in from `data/processed/stats.json` and the notebook): number of proteins ____, number of GO terms ____ (MF ____, BP ____, CC ____), embedded proteins ____ (limit or full), epochs trained ____.
 - Results (test split): see the table in the main README. Summary: Fmax about 0.94 to 0.95 for all three ontologies; hierarchy loss lowers violations from 0.0071 to 0.0048 with no real change in Fmax or AUPR.
 
 ### Observations and known issues
