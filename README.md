@@ -86,7 +86,7 @@ git push                           # so Colab can fetch the code
 
 **On Google Drive:** upload `data/processed.zip` to `MyDrive/ontology-aware-protein-function-prediction/data/`
 
-**On Colab (T4 GPU):** open `notebooks/protein_function_colab.ipynb` and run all cells. It does:
+**On Colab (T4 GPU):** open `notebooks/01_data_preprocessing.ipynb` and run all cells. It does:
 ESM-2 650M embeddings (`embed.py`) → MLP baseline + ontology-aware model (`train.py`) → metrics (`evaluate.py`).
 Start with `EMBED_LIMIT = 50000`, then set it to `None` for the full run (resumes if Colab disconnects).
 
