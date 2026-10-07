@@ -9,7 +9,9 @@ probability than its parent, a common biological-consistency failure of simpler 
 
 ## Team
 
-Khushi Patil, Diya Kalghatgi, Nidhi Nayak. 
+Khushi Patil
+Diya Kalghatgi
+Nidhi Nayak. 
 
 Guide: Prof. AshaRani Patil.
 
