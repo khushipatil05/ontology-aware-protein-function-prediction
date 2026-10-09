@@ -23,7 +23,7 @@ Repo structure (`data/`, `src/`, `models/`, `notebooks/`, `results/`, `docs/`) a
 - Tested data prep, training and evaluation code on small synthetic data (embedding step could not be tested before the Colab run).
 
 ## Milestone 3 — Environment decisions
-- Laptop (HP OmniBook X, Intel Core Ultra, 16 GB RAM) has integrated graphics only, so no CUDA. Decision: laptop for data prep (and optionally training), Colab T4 for ESM-2 650M embeddings.
+- Laptop has integrated graphics only, so no CUDA. Decision: laptop for data prep (and optionally training), Colab T4 for ESM-2 650M embeddings.
 
 ## Milestone 4 — First full run on Colab (done)
 - Embeddings extracted, baseline (lambda=0) and ontology-aware (lambda=0.5) models trained and evaluated.
