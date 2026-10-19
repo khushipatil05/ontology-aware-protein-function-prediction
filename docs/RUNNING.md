@@ -1,8 +1,8 @@
 # Running the pipeline
 
 ```
-data/raw/uniprot_sprot.fasta      <- dataset 1 (you have it)
-data/raw/goa_uniprot_all.gaf      <- dataset 2 (you have it)
+data/raw/uniprot_sprot.fasta      <- dataset 1 
+data/raw/goa_uniprot_all.gaf      <- dataset 2 
 data/raw/go-basic.obo             <- dataset 3 (Gene Ontology; python src/download_go.py)
 ```
 
